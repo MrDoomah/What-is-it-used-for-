@@ -212,12 +212,14 @@ function add_top_button(player)
 		flow = player.gui.top.add{type = "flow", name = "wiiuf_flow"}
 	end
 	if global.n_fluids < 10 then flow.direction = "vertical" else flow.direction = "horizontal" end
-	if flow["looking-glass"] then flow["looking-glass"].destroy()	-- remove the old 1.0.x button
-	else 
-		local search_flow = flow.add{type = "flow", name = "search_flow", direction = "horizontal", style = "search_flow_style"}
-		 search_flow.add{type = "flow", name = "search_bar_placeholder", direction = "vertical"}
-		search_flow.add{type = "sprite-button", name = "looking-glass", sprite = "looking-glass", style = "search_button_style", tooltip = {"top_button_tooltip"}}
-	end
+
+	if flow["looking-glass"] then flow["looking-glass"].destroy()	end -- remove the old 1.0.x button
+	
+	if flow["search_flow"] then flow["search_flow"].destroy() end
+	local search_flow = flow.add{type = "flow", name = "search_flow", direction = "horizontal", style = "search_flow_style"}
+	search_flow.add{type = "flow", name = "search_bar_placeholder", direction = "vertical"}
+	search_flow.add{type = "sprite-button", name = "looking-glass", sprite = "looking-glass", style = "search_button_style", tooltip = {"top_button_tooltip"}}
+
 end
 
 script.on_init(function()
