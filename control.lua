@@ -312,6 +312,7 @@ script.on_event(defines.events.on_gui_text_changed, function(event)
 		local player = game.players[event.player_index]
 		if player.gui.top.wiiuf_flow.search_flow.search_bar_placeholder.search_bar_scroll then player.gui.top.wiiuf_flow.search_flow.search_bar_placeholder.search_bar_scroll.destroy() end
 		
+		if string.len(event.element.text) < 2 then return end
 		
 		local scroll_pane = player.gui.top.wiiuf_flow.search_flow.search_bar_placeholder.add{type = "scroll-pane", name = "search_bar_scroll", style = "small_spacing_scroll_pane_style"}
 		scroll_pane.style.maximal_height = 250
