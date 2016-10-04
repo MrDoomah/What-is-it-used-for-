@@ -327,11 +327,12 @@ script.on_event(defines.events.on_gui_text_changed, function(event)
 		results_table.add{type = "label", name = "wiiuf_filler_label_1"}
 		results_table.add{type = "label", name = "wiiuf_filler_label_2"}
 		
+		-- remove capitals, purge special characters, and replace spaces with -
+		local text = event.element.text:lower()
+		text = text:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
+		text = text:gsub(" ", "%%-")
+		
 		for _, item in pairs(game.item_prototypes) do
-			local text = event.element.text:lower()
-			-- purge special characters, and replace spaces with -
-			text = text:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
-			text = text:gsub(" ", "%%-")
 			if item.name:find(text) then
 				results_table.add{type = "sprite", name = "wiiuf_item_sprite_" .. item.name, sprite = "item/"..item.name}
 				local label = results_table.add{type = "label", name = "wiiuf_item_label_" .. item.name, caption = item.localised_name}
@@ -340,10 +341,6 @@ script.on_event(defines.events.on_gui_text_changed, function(event)
 			end
 		end
 		for _, item in pairs(game.fluid_prototypes) do
-			local text = event.element.text:lower()
-			-- purge special characters, and replace spaces with -
-			text = text:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
-			text = text:gsub(" ", "%%-")
 			if item.name:find(text) then
 				results_table.add{type = "sprite", name = "wiiuf_fluid_" .. item.name, sprite = "fluid/"..item.name}
 				local label = results_table.add{type = "label", name = "wiiuf_fluid_label_" .. item.name, caption = item.localised_name}
