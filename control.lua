@@ -259,6 +259,10 @@ script.on_event(defines.events.on_gui_click, function(event)
 			end
 		end
 	
+	--Label for sprite in search results. Check it before root "wiiuf_fluid_"
+	elseif event.element.name:find("wiiuf_fluid_label_") then
+		identify(event.element.name:sub(19), player)
+	
 	elseif event.element.name:find("wiiuf_fluid_") then
 		identify(event.element.name:sub(13), player)
 		if player.gui.top.wiiuf_flow.fluids_table then player.gui.top.wiiuf_flow.fluids_table.destroy() end
@@ -322,13 +326,25 @@ script.on_event(defines.events.on_gui_text_changed, function(event)
 		results_table.add{type = "label", name = "wiiuf_filler_label_2"}
 		
 		for _, item in pairs(game.item_prototypes) do
-			local text = event.element.text
+			local text = event.element.text:lower()
 			-- purge special characters, and replace spaces with -
 			text = text:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
 			text = text:gsub(" ", "%%-")
 			if item.name:find(text) then
 				results_table.add{type = "sprite", name = "wiiuf_item_sprite_" .. item.name, sprite = "item/"..item.name}
 				local label = results_table.add{type = "label", name = "wiiuf_item_label_" .. item.name, caption = item.localised_name}
+				label.style.minimal_height = 34
+				label.style.minimal_width = 101
+			end
+		end
+		for _, item in pairs(game.fluid_prototypes) do
+			local text = event.element.text:lower()
+			-- purge special characters, and replace spaces with -
+			text = text:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
+			text = text:gsub(" ", "%%-")
+			if item.name:find(text) then
+				results_table.add{type = "sprite", name = "wiiuf_fluid_" .. item.name, sprite = "fluid/"..item.name}
+				local label = results_table.add{type = "label", name = "wiiuf_fluid_label_" .. item.name, caption = item.localised_name}
 				label.style.minimal_height = 34
 				label.style.minimal_width = 101
 			end
