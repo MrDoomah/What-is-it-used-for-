@@ -300,6 +300,7 @@ script.on_event("inspect_item", function(event)
 	else
 		if player.gui.top.wiiuf_flow.search_flow.search_bar_placeholder.search_bar_textfield then
 			player.gui.top.wiiuf_flow.search_flow.search_bar_placeholder.search_bar_textfield.destroy()
+			if player.gui.top.wiiuf_flow.search_flow.search_bar_placeholder.search_bar_scroll then player.gui.top.wiiuf_flow.search_flow.search_bar_placeholder.search_bar_scroll.destroy() end
 		else
 			player.gui.top.wiiuf_flow.search_flow.search_bar_placeholder.add{type = "textfield", name = "search_bar_textfield"}
 		end
