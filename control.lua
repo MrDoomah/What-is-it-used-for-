@@ -1,16 +1,30 @@
+SHOW_ALL = false	-- Set to true to also display disabled recipes and recipes without technology.
+
 function find_technology(recipe, player)
 	for _,tech in pairs(player.force.technologies) do
 		if not tech.researched then
 			for _, effect in pairs(tech.effects) do
 				if effect.type == "unlock-recipe" then
 					if effect.recipe == recipe then
-						return tech.localised_name
+						if tech.enabled then
+							return tech.localised_name
+						else
+							if SHOW_ALL then 
+								return {"disabled_tech", tech.localised_name}
+							else 
+								return false 
+							end
+						end
 					end
 				end
 			end
 		end
 	end
-	return {"not_found"}
+	if SHOW_ALL then
+		return {"not_found"}
+	else
+		return false
+	end
 end
 
 function identify(item, player, side)
@@ -21,22 +35,18 @@ function identify(item, player, side)
 	local product_of = {}
 	
 	for name, recipe in pairs(player.force.recipes) do
-		if not recipe.hidden then
+		for _, ingredient in pairs(recipe.ingredients) do
+			if ingredient.name ==  item then
+				table.insert(ingredient_in, recipe)
+				break
+			end
+		end
 		
-			for _, ingredient in pairs(recipe.ingredients) do
-				if ingredient.name ==  item then
-					table.insert(ingredient_in, recipe)
-					break
-				end
+		for _, product in pairs(recipe.products) do
+			if product.name == item then
+				table.insert(product_of, recipe)
+				break
 			end
-			
-			for _, product in pairs(recipe.products) do
-				if product.name == item then
-					table.insert(product_of, recipe)
-					break
-				end
-			end
-			
 		end
 	end
 	
@@ -119,40 +129,53 @@ function identify(item, player, side)
 		body_flow = main_frame.add{type = "flow", name = "wiiuf_body_flow", direction = "horizontal", style = "achievements_flow_style"}
 	end
 	
-	
 	-- ingredient in
-	if #ingredient_in > 0 or not side then
-		local ingredient_frame = body_flow.add{type = "frame", name = "wiiuf_ingredient_frame", caption = {"ingredient_in"}}
-		local ingredient_scroll = ingredient_frame.add{type = "scroll-pane", name = "wiiuf_ingredient_scroll"}
-		ingredient_scroll.style.minimal_height = table_height
-		ingredient_scroll.style.maximal_height = table_height
-		local ingredient_table = ingredient_scroll.add{type = "table", name = "wiiuf_ingredient_table", colspan = 2}
-		for i, recipe in pairs(ingredient_in) do
+	local ingredient_frame = body_flow.add{type = "frame", name = "wiiuf_ingredient_frame", caption = {"ingredient_in"}}
+	local ingredient_scroll = ingredient_frame.add{type = "scroll-pane", name = "wiiuf_ingredient_scroll"}
+	ingredient_scroll.style.minimal_height = table_height
+	ingredient_scroll.style.maximal_height = table_height
+	local ingredient_table = ingredient_scroll.add{type = "table", name = "wiiuf_ingredient_table", colspan = 2}
+	for i, recipe in pairs(ingredient_in) do
+		local from_research = recipe.enabled or find_technology(recipe.name, player)
+		if from_research then
 			ingredient_table.add{type = "sprite", name = "wiiuf_sprite_" .. i, sprite = "recipe/"..recipe.name}
 			local label = ingredient_table.add{type = "label", name = "wiiuf_label_" .. i, caption = recipe.localised_name}
 			label.style.minimal_height = 34
 			if not recipe.enabled then
 				label.style = "invalid_label_style"
-				label.tooltip = {"behind_research", find_technology(recipe.name, player)}
+				label.tooltip = {"behind_research", from_research}
 			end
+		else
+			table.remove(ingredient_in, i)
 		end
 	end
+	
+	if side and #ingredient_in == 0 then
+		ingredient_frame.destroy()
+	end
 	-- product of
-	if #product_of > 0 or not side then
-		local product_frame = body_flow.add{type = "frame", name = "wiiuf_product_frame", caption = {"product_of"}}
-		local product_scroll = product_frame.add{type = "scroll-pane", name = "wiiuf_product_scroll"}
-		product_scroll.style.minimal_height = table_height
-		product_scroll.style.maximal_height = table_height
-		local product_table = product_scroll.add{type = "table", name = "wiiuf_product_table", colspan = 2}
-		for i, recipe in pairs(product_of) do
+	local product_frame = body_flow.add{type = "frame", name = "wiiuf_product_frame", caption = {"product_of"}}
+	local product_scroll = product_frame.add{type = "scroll-pane", name = "wiiuf_product_scroll"}
+	product_scroll.style.minimal_height = table_height
+	product_scroll.style.maximal_height = table_height
+	local product_table = product_scroll.add{type = "table", name = "wiiuf_product_table", colspan = 2}
+	for i, recipe in pairs(product_of) do
+		local from_research = recipe.enabled or find_technology(recipe.name, player)
+		if from_research then
 			product_table.add{type = "sprite", name = "wiiuf_sprite_" .. i, sprite = "recipe/"..recipe.name}
 			local label = product_table.add{type = "label", name = "wiiuf_label_" .. i, caption = recipe.localised_name}
 			label.style.minimal_height = 34
 			if not recipe.enabled then
 				label.style = "invalid_label_style"
-				label.tooltip = {"behind_research", find_technology(recipe.name, player)}
+				label.tooltip = {"behind_research", from_research}
 			end
+		else
+			table.remove(product_of, i)
 		end
+	end
+	
+	if side and #product_of == 0 then
+		product_frame.destroy()
 	end
 	-- mined from
 	if #mined_from > 0 or not side then
