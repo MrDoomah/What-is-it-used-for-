@@ -356,7 +356,7 @@ script.on_event(defines.events.on_gui_text_changed, function(event)
 		text = text:gsub(" ", "%%-")
 		
 		for _, item in pairs(game.item_prototypes) do
-			if item.name:find(text) then
+			if item.name:lower():find(text) then
 				results_table.add{type = "sprite", name = "wiiuf_item_sprite_" .. item.name, sprite = "item/"..item.name}
 				local label = results_table.add{type = "label", name = "wiiuf_item_label_" .. item.name, caption = item.localised_name}
 				label.style.minimal_height = 34
@@ -364,7 +364,7 @@ script.on_event(defines.events.on_gui_text_changed, function(event)
 			end
 		end
 		for _, item in pairs(game.fluid_prototypes) do
-			if item.name:find(text) then
+			if item.name:lower():find(text) then
 				results_table.add{type = "sprite", name = "wiiuf_fluid_" .. item.name, sprite = "fluid/"..item.name}
 				local label = results_table.add{type = "label", name = "wiiuf_fluid_label_" .. item.name, caption = item.localised_name}
 				label.style.minimal_height = 34
